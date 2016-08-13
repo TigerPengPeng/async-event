@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-4.0.xsd
+	">
+
+    <context:component-scan base-package="developer.github">
+    </context:component-scan>
+
+    <bean id="sysConfig" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="locations">
+            <list>
+                <value>classpath*:config/sys.*.properties</value>
+            </list>
+        </property>
+        <property name="fileEncoding" value="utf-8"></property>
+    </bean>
+
+    <context:property-placeholder properties-ref="sysConfig" />
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">
+        <property name="properties" ref="sysConfig" />
+    </bean>
+
+    <bean id="rabbitConnectionFactory" class="developer.github.factory.rabbitmq.RabbitConnectionFactory" destroy-method="destroy">
+        <constructor-arg index="0" value="${rabbit.username}"/>
+        <constructor-arg index="1" value="${rabbit.password}"/>
+        <constructor-arg index="2" value="${rabbit.vhost}"/>
+        <constructor-arg index="3" value="${rabbit.address}"/>
+    </bean>
+    <bean id="rabbitConnection" factory-bean="rabbitConnectionFactory" factory-method="get" />
+
+    <bean id="rabbitChannelFactory" class="developer.github.factory.rabbitmq.RabbitChannelFactory" destroy-method="destroy">
+        <constructor-arg index="0" ref="rabbitConnection"/>
+    </bean>
+    <bean id="rabbitChannel" factory-bean="rabbitChannelFactory" factory-method="get" />
+
+    <bean id="objectMapperFactory" class="developer.github.factory.jackson.ObjectMapperFactory" destroy-method="destroy" />
+    <bean id="objectMapper" factory-bean="objectMapperFactory" factory-method="get" />
+
+</beans>
