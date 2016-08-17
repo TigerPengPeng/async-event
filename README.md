@@ -89,5 +89,14 @@ override method getQueueName() （ 自定义的queue name， 没用随机生成�
 
 目前的不足：
   若消费者没有找到对应event的处理方法，消费者会将该条消息requeue到消息队列。风险就是，如果谁了一条不会没有对应处理方法的消息，这条消息会永远无法消费。
+  
+  
+ #required#
+    this module dependency https://github.com/TigerPengPeng/core.git
+    first, you need git clone https://github.com/TigerPengPeng/core.git to local
+    and then, run mvn clean install -DskipTests -U
+
+
+    if you are using ide to import this model, you need install plugins lombok
 
 参考资料：http://www.rabbitmq.com/tutorials/tutorial-five-java.html
