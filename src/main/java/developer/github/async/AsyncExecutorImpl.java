@@ -2,8 +2,8 @@ package developer.github.async;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import developer.github.event.ErrorLogEvent;
-import developer.github.utils.ExceptionUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -57,7 +57,7 @@ public class AsyncExecutorImpl implements AsyncExecutor {
     }
 
     protected void pushErrorMessage(Throwable t, String body) {
-        ErrorLogEvent errorLogEvent = new ErrorLogEvent(body, ExceptionUtils.getThrowableString(t));
+        ErrorLogEvent errorLogEvent = new ErrorLogEvent(body, ExceptionUtils.getFullStackTrace(t));
         producer.durabilityPublish(errorLogEvent);
     }
 
