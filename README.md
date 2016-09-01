@@ -13,6 +13,8 @@
     4. last, you can use maven to build module
        mvn build
        mvn clean install -DskipTests -U
+       or
+       mvn clean install -Dscale=/ (if you can connect to your rabbitmq server)
 
 # samples #
     sample is at dir test.
