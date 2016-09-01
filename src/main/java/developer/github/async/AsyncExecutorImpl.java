@@ -68,11 +68,11 @@ public class AsyncExecutorImpl implements AsyncExecutor {
      *        <br>
      *              bytes 需要满足格式{"object": ..., "event": ...}的格式
      *              bytes 反序列化失败, 抛出error log message, return 0
-     *              bytes.event class not found, 可能是不同环境的消息, reject message to queue, return -1
+     *              bytes.event class not found, 抛出error log message, return 0
      *        </br>
      * @return
      *         <br>
-     *             -1: 没找到event or event的执行方法; reject message
+     *             -1: 保留位, reject message
      *             非-1: 正常执行 or 反序列化失败; ack message
      *         </br>
      * @throws Throwable
@@ -82,9 +82,6 @@ public class AsyncExecutorImpl implements AsyncExecutor {
         AsyncBody body = null;
         try {
             body = receiveMessageBody(bytes);
-        } catch (ClassNotFoundException e) {
-            log.info("{}", e);
-            return -1;
         } catch (Throwable t) {
             log.error("{}" , t);
             pushErrorMessage(t, new String(bytes));
@@ -99,7 +96,8 @@ public class AsyncExecutorImpl implements AsyncExecutor {
 
         List<AsyncSubscriber> subscribers = asyncRegister.get(event);
         if (CollectionUtils.isEmpty(subscribers)) {
-            return -1;
+            log.error("{} find no subscribers", event);
+            pushErrorMessage(new RuntimeException(event + "find no subscribers"), new String(bytes));
         }
 
         // 执行方法中抛错, 发送一条error message
